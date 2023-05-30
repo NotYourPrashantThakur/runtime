@@ -32,7 +32,7 @@ def dump_runtime_classes(package_name):
         print("APK file not found for the specified package name.")
 
 # Specify the package name of your app
-package_name = 'com.pubg.imobile'
+package_name = 'com.pubg.krmobile'
 
 # Call the function to dump the runtime classes
 dump_runtime_classes(package_name)
