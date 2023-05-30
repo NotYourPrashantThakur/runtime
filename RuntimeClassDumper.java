@@ -1,50 +1,49 @@
+import java.lang.instrument.Instrumentation;
+import java.lang.instrument.UnmodifiableClassException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 public class RuntimeClassDumper {
 
     public static void dumpRuntimeClasses() {
-        // Get the class loader of the current thread
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        Class<?>[] loadedClasses = getAllLoadedClasses();
+        if (loadedClasses != null) {
+            for (Class<?> clazz : loadedClasses) {
+                System.out.println("Class: " + clazz.getName());
 
-        // Iterate through all loaded classes
-        for (Class<?> clazz : getLoadedClasses(classLoader)) {
-            System.out.println("Class: " + clazz.getName());
+                System.out.println("Fields:");
+                for (Field field : clazz.getDeclaredFields()) {
+                    System.out.println(field.toString());
+                }
 
-            // Dump fields
-            System.out.println("Fields:");
-            for (Field field : clazz.getDeclaredFields()) {
-                System.out.println(field.toString());
+                System.out.println("Methods:");
+                for (Method method : clazz.getDeclaredMethods()) {
+                    System.out.println(method.toString());
+                }
+
+                System.out.println();
             }
-
-            // Dump methods
-            System.out.println("Methods:");
-            for (Method method : clazz.getDeclaredMethods()) {
-                System.out.println(method.toString());
-            }
-
-            System.out.println();
+        } else {
+            System.out.println("Failed to get loaded classes.");
         }
     }
 
-    private static Class<?>[] getLoadedClasses(ClassLoader classLoader) {
+    private static Class<?>[] getAllLoadedClasses() {
         try {
-            // Get the 'classes' field from the ClassLoader class
-            Field classesField = ClassLoader.class.getDeclaredField("classes");
-            classesField.setAccessible(true);
+            Instrumentation instrumentation = java.lang.instrument.Instrumentation.class.cast(
+                    ClassLoader.getSystemClassLoader().loadClass("java.lang.instrument.Instrumentation")
+                            .getMethod("getInstrumentation")
+                            .invoke(null)
+            );
 
-            // Get the array of loaded classes
-            Object classes = classesField.get(classLoader);
-
-            // Convert the array to Class<?>[]
-            if (classes instanceof Class<?>[]) {
-                return (Class<?>[]) classes;
-            }
+            return instrumentation.getAllLoadedClasses();
+        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException |
+                UnmodifiableClassException e) {
+            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        return new Class<?>[0];
+        return null;
     }
 
     public static void main(String[] args) {
