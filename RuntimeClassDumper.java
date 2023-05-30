@@ -4,7 +4,7 @@ import java.lang.reflect.Method;
 
 public class RuntimeClassDumper {
 
-    public static void dumpRuntimeClasses() {
+    public static void dumpRuntimeClasses() throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException {
         Class<?>[] loadedClasses = getAllLoadedClasses();
         if (loadedClasses != null) {
             for (Class<?> clazz : loadedClasses) {
@@ -27,22 +27,17 @@ public class RuntimeClassDumper {
         }
     }
 
-    private static Class<?>[] getAllLoadedClasses() {
-        try {
-            Instrumentation instrumentation = java.lang.instrument.Instrumentation.class.cast(
-                    ClassLoader.getSystemClassLoader().loadClass("java.lang.instrument.Instrumentation")
-                            .getMethod("getInstrumentation")
-                            .invoke(null)
-            );
+    private static Class<?>[] getAllLoadedClasses() throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException {
+        Instrumentation instrumentation = java.lang.instrument.Instrumentation.class.cast(
+                ClassLoader.getSystemClassLoader().loadClass("java.lang.instrument.Instrumentation")
+                        .getMethod("getInstrumentation")
+                        .invoke(null)
+        );
 
-            return instrumentation.getAllLoadedClasses();
-        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return instrumentation.getAllLoadedClasses();
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException {
         dumpRuntimeClasses();
     }
 }
