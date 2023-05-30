@@ -1,5 +1,4 @@
 import java.lang.instrument.Instrumentation;
-import java.lang.instrument.UnmodifiableClassException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
@@ -37,10 +36,7 @@ public class RuntimeClassDumper {
             );
 
             return instrumentation.getAllLoadedClasses();
-        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException |
-                UnmodifiableClassException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
+        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException e) {
             e.printStackTrace();
         }
         return null;
