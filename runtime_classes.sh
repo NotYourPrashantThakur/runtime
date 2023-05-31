@@ -1,7 +1,7 @@
 #!/data/data/com.termux/files/usr/bin/bash
 
 # Specify the package name of the app you want to inspect
-PACKAGE_NAME="com.pubg.krmobile"
+PACKAGE_NAME="com.pubg.imobile"
 
 # Specify the library name you want to analyze (without the lib prefix and .so extension)
 LIB_NAME="anogs"
