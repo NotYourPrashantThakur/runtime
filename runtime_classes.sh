@@ -4,7 +4,7 @@
 PACKAGE_NAME="com.pubg.krmobile"
 
 # Specify the library name you want to analyze (without the lib prefix and .so extension)
-LIB_NAME="libanogs.so"
+LIB_NAME="anogs"
 
 # Get the PID of the app
 PID=$(ps -A | grep "$PACKAGE_NAME" | awk '{print $2}')
