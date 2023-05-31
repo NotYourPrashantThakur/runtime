@@ -1,33 +1,22 @@
-#!/data/data/com.termux/files/usr/bin/bash
+#!/bin/sh
 
-# Specify the package name of the app you want to inspect
+# Specify the package name of the app
 PACKAGE_NAME="com.pubg.imobile"
 
-# Specify the library name you want to analyze (without the lib prefix and .so extension)
-LIB_NAME="anogs"
+# Find the process ID (PID) of the app
+PID=$(ps -A | grep $PACKAGE_NAME | awk '{print $2}')
 
-# Get the PID of the app
-PID=$(ps -A | grep "$PACKAGE_NAME" | awk '{print $2}')
-
-if [ -z "$PID" ]; then
-  echo "No running process found for $PACKAGE_NAME"
+# Check if the app process is running
+if [ -n "$PID" ]; then
+  echo "App process found. PID: $PID"
+else
+  echo "App process not found."
   exit 1
 fi
 
-# Get the shared library path loaded by the process
-LIB_PATH=$(ls -l /proc/$PID/maps | awk '/'"$LIB_NAME"'\.so/{print $NF}')
+# Get the runtime classes of the app using the PID
+echo "Runtime classes of the app:"
+adb shell "cat /proc/$PID/maps" | awk '/\.dex$|\.jar$|\.apk$/{print $6}' | sort -u
 
-if [ -z "$LIB_PATH" ]; then
-  echo "Library $LIB_NAME not found in the process"
-  exit 1
-fi
-
-# Extract the absolute path of the library
-ABS_PATH=$(readlink -f $LIB_PATH)
-
-# Get the class names from the library using strings command
-CLASS_NAMES=$(strings $ABS_PATH | grep -E "\bL[a-zA-Z0-9_/;<>$]+;" | sed -e 's#^L\(.*\);#\1#g')
-
-# Output the class names
-echo "Classes in $LIB_NAME:"
-echo "$CLASS_NAMES"
+# Disconnect from the device
+adb disconnect
