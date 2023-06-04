@@ -71,5 +71,5 @@ int main() {
 
     // Your code continues here...
 
-    return 0;
+    return 1;
 }
